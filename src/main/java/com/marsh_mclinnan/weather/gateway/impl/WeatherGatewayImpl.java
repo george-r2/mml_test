@@ -28,14 +28,13 @@ import lombok.RequiredArgsConstructor;
 public class WeatherGatewayImpl implements WeatherPort {
 	Logger logger = LoggerFactory.getLogger(WeatherGatewayImpl.class);
 
+	private final RestTemplate restTemplateCustom;
 	private final OpenWeatherProperties opwProperties;
 	private final WeatherMapper mapper;
 
 	@Override
 	public WeatherCurrentDO getCurrentWeather(BigDecimal lat, BigDecimal lon) {
 		logger.info("getCurrentWeather");
-
-		RestTemplate restTemplate = new RestTemplate();
 		
 		URI uri = UriComponentsBuilder.fromHttpUrl(opwProperties.getWeather().getCurrentUrl())
 				.queryParam(OpenWeatherConstants.QUERY_PARAM_LAT, lat)
@@ -45,7 +44,7 @@ public class WeatherGatewayImpl implements WeatherPort {
 				.build().toUri() ;
 
 		ResponseEntity<WeatherCurrentRsResponse> response 
-			= restTemplate.exchange(uri, HttpMethod.GET, null, new ParameterizedTypeReference<WeatherCurrentRsResponse>(){} ) ;
+			= restTemplateCustom.exchange(uri, HttpMethod.GET, null, new ParameterizedTypeReference<WeatherCurrentRsResponse>(){} ) ;
 		
 		return mapper.responseToDomain(response.getBody());
 	}
@@ -53,8 +52,6 @@ public class WeatherGatewayImpl implements WeatherPort {
 	@Override
 	public WeatherForecastDO getForecastWeather(BigDecimal lat, BigDecimal lon) {
 		logger.info("getForecastWeather");
-
-		RestTemplate restTemplate = new RestTemplate();
 		
 		URI uri = UriComponentsBuilder.fromHttpUrl(opwProperties.getWeather().getForecastUrl())
 				.queryParam(OpenWeatherConstants.QUERY_PARAM_LAT, lat)
@@ -64,7 +61,7 @@ public class WeatherGatewayImpl implements WeatherPort {
 				.build().toUri() ;
 
 		ResponseEntity<WeatherForecastRsResponse> response 
-			= restTemplate.exchange(uri, HttpMethod.GET, null, new ParameterizedTypeReference<WeatherForecastRsResponse>(){} ) ;
+			= restTemplateCustom.exchange(uri, HttpMethod.GET, null, new ParameterizedTypeReference<WeatherForecastRsResponse>(){} ) ;
 		
 		return mapper.responseToDomain(response.getBody());
 	}

@@ -26,14 +26,13 @@ import lombok.RequiredArgsConstructor;
 public class AirPollutionGatewayImpl implements AirPollutionPort {
 	Logger logger = LoggerFactory.getLogger(AirPollutionGatewayImpl.class);
 
+	private final RestTemplate restTemplateCustom;
 	private final OpenWeatherProperties opwProperties;
 	private final AirPollutionMapper mapper;
 
 	@Override
 	public AirPollutionDO getAirPollutionPort(BigDecimal lat, BigDecimal lon) {
 		logger.info("getAirPollutionPort invoked");
-		RestTemplate restTemplate = new RestTemplate();
-		
 		URI uri = UriComponentsBuilder.fromHttpUrl(opwProperties.getAirPollution().getAirPollutionUrl())
 				.queryParam(OpenWeatherConstants.QUERY_PARAM_LAT, lat)
 				.queryParam(OpenWeatherConstants.QUERY_PARAM_LON, lon)
@@ -41,7 +40,7 @@ public class AirPollutionGatewayImpl implements AirPollutionPort {
 				.build().toUri() ;
 		
 		ResponseEntity<AirPollutionRsResponse> response 
-			= restTemplate.exchange(uri, HttpMethod.GET, null, new ParameterizedTypeReference<AirPollutionRsResponse>(){} ) ;
+			= restTemplateCustom.exchange(uri, HttpMethod.GET, null, new ParameterizedTypeReference<AirPollutionRsResponse>(){} ) ;
 	 
 		return mapper.responseToDomain(response.getBody());
 	}

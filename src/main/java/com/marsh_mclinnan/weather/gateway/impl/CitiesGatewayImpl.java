@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class CitiesGatewayImpl implements CitiesPort {
 	Logger logger = LoggerFactory.getLogger(CitiesGatewayImpl.class);
 	
+	private final RestTemplate restTemplateCustom;
 	private final OpenWeatherProperties opwProperties;
 	private final CityMapper mapper;
 
@@ -36,22 +37,19 @@ public class CitiesGatewayImpl implements CitiesPort {
 	public List<CityDO> getCityInfo(String cityName) {
 		logger.info("App key {}",opwProperties.getAppKey());
 		
-		RestTemplate restTemplate = new RestTemplate();
-		String fooResourceUrl
-			= opwProperties.getGeocode().getGeocodeUrl();
 		StringBuilder sb = new StringBuilder();
 		sb.append(cityName);
 		sb.append(",");
 		sb.append(OpenWeatherConstants.US_COUNTRY_CODE);
 
-		URI uri = UriComponentsBuilder.fromHttpUrl(fooResourceUrl)
+		URI uri = UriComponentsBuilder.fromHttpUrl(opwProperties.getGeocode().getGeocodeUrl())
 				.queryParam(OpenWeatherConstants.QUERY_PARAM_CITY, cityName)
 				.queryParam(OpenWeatherConstants.QUERY_PARAM_LIMIT, opwProperties.getGeocode().getLimitResults())
 				.queryParam(OpenWeatherConstants.QUERY_PARAM_APP_ID, opwProperties.getAppKey())
 				.build().toUri() ;
 
 		ResponseEntity<List<CityInfoRsResponse>> response 
-			= restTemplate.exchange(uri, HttpMethod.GET, null, new ParameterizedTypeReference<List<CityInfoRsResponse>>(){} ) ;
+			= restTemplateCustom.exchange(uri, HttpMethod.GET, null, new ParameterizedTypeReference<List<CityInfoRsResponse>>(){} ) ;
 
 		if(response.hasBody()) {
 			return response.getBody().stream()
