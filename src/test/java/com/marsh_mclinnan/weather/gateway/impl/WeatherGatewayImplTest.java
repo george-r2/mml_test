@@ -35,7 +35,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.marsh_mclinnan.weather.commons.constants.OpenWeatherConstants;
 import com.marsh_mclinnan.weather.domain.WeatherCurrentDO;
 import com.marsh_mclinnan.weather.domain.WeatherForecastDO;
-import com.marsh_mclinnan.weather.gateway.WeatherPort;
+import com.marsh_mclinnan.weather.gateway.WeatherGateway;
 import com.marsh_mclinnan.weather.gateway.mapper.WeatherMapper;
 import com.marsh_mclinnan.weather.properties.OpenWeatherProperties;
 import com.marsh_mclinnan.weather.properties.OpenWeatherProperties.Weather;
@@ -78,7 +78,7 @@ class WeatherGatewayImplTest {
 	@Mock
 	private OpenWeatherProperties opwProperties;
 	
-	private WeatherPort weatherPort;
+	private WeatherGateway weatherGateway;
 	
 	private ObjectMapper objectMapper = new ObjectMapper();
 	private WeatherMapper mapper;
@@ -99,7 +99,7 @@ class WeatherGatewayImplTest {
 		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
 		mapper = Mappers.getMapper(WeatherMapper.class);
-		weatherPort = new WeatherGatewayImpl(restTemplateCustom, opwProperties, mapper);
+		weatherGateway = new WeatherGatewayImpl(restTemplateCustom, opwProperties, mapper);
 	}
 	
 	@Test
@@ -113,7 +113,7 @@ class WeatherGatewayImplTest {
 					.contentType(MediaType.APPLICATION_JSON)
 					.body(responseCurrentJson));
 		 
-		 WeatherCurrentDO current = weatherPort.getCurrentWeather(new BigDecimal(LAT), new BigDecimal(LON));
+		 WeatherCurrentDO current = weatherGateway.getCurrentWeather(new BigDecimal(LAT), new BigDecimal(LON));
 		 assertThat(current).isNotNull();
 	}
 	
@@ -128,7 +128,7 @@ class WeatherGatewayImplTest {
 					.contentType(MediaType.APPLICATION_JSON)
 					.body(responseForecastJson));
 		
-		WeatherForecastDO forecast = weatherPort.getForecastWeather(new BigDecimal(LAT), new BigDecimal(LON));
+		WeatherForecastDO forecast = weatherGateway.getForecastWeather(new BigDecimal(LAT), new BigDecimal(LON));
 		assertThat(forecast).isNotNull();
 	}
 	

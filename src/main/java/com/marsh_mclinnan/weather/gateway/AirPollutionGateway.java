@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import com.marsh_mclinnan.weather.domain.AirPollutionDO;
 
-public interface AirPollutionPort {
+public interface AirPollutionGateway {
 
-	AirPollutionDO getAirPollutionPort(BigDecimal lat, BigDecimal lon);
+	AirPollutionDO getAirPollutionPort(BigDecimal lat, BigDecimal lon) ;
 }

@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import com.marsh_mclinnan.weather.domain.WeatherCurrentDO;
 import com.marsh_mclinnan.weather.domain.WeatherForecastDO;
 
-public interface WeatherPort {
+public interface WeatherGateway {
 
 	WeatherCurrentDO getCurrentWeather(BigDecimal lat, BigDecimal lon);
 

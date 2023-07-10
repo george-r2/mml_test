@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.marsh_mclinnan.weather.commons.constants.OpenWeatherConstants;
 import com.marsh_mclinnan.weather.domain.AirPollutionDO;
-import com.marsh_mclinnan.weather.gateway.AirPollutionPort;
+import com.marsh_mclinnan.weather.gateway.AirPollutionGateway;
 import com.marsh_mclinnan.weather.gateway.mapper.AirPollutionMapper;
 import com.marsh_mclinnan.weather.properties.OpenWeatherProperties;
 import com.marsh_mclinnan.weather.properties.OpenWeatherProperties.AirPollution;
@@ -55,7 +55,7 @@ class AirPollutionGatewayImplTest {
 	@Mock
 	private OpenWeatherProperties opwProperties;
 	
-	private AirPollutionPort airPollutionPort;
+	private AirPollutionGateway airPollutionGateway;
 	
 	private ObjectMapper objectMapper = new ObjectMapper();
 	private AirPollutionMapper mapper;
@@ -76,7 +76,7 @@ class AirPollutionGatewayImplTest {
 		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
 		mapper = Mappers.getMapper(AirPollutionMapper.class);
-		airPollutionPort = new AirPollutionGatewayImpl(restTemplateCustom, opwProperties, mapper);
+		airPollutionGateway = new AirPollutionGatewayImpl(restTemplateCustom, opwProperties, mapper);
 	}
 
 	@Test
@@ -94,7 +94,7 @@ class AirPollutionGatewayImplTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.body(responseJson));
 		 
-		AirPollutionDO result = airPollutionPort.getAirPollutionPort(new BigDecimal(LAT), new BigDecimal(LON));
+		AirPollutionDO result = airPollutionGateway.getAirPollutionPort(new BigDecimal(LAT), new BigDecimal(LON));
 		assertThat(result).isNotNull();
 	}
 }

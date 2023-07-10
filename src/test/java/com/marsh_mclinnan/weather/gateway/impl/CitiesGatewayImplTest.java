@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.marsh_mclinnan.weather.commons.constants.OpenWeatherConstants;
 import com.marsh_mclinnan.weather.domain.CityDO;
-import com.marsh_mclinnan.weather.gateway.CitiesPort;
+import com.marsh_mclinnan.weather.gateway.CitiesGateway;
 import com.marsh_mclinnan.weather.gateway.mapper.CityMapper;
 import com.marsh_mclinnan.weather.properties.OpenWeatherProperties;
 import com.marsh_mclinnan.weather.properties.OpenWeatherProperties.GeoCodeProperties;
@@ -53,7 +53,7 @@ class CitiesGatewayImplTest {
 	@Mock
 	private OpenWeatherProperties opwProperties;
 	
-	private CitiesPort citiesPort;
+	private CitiesGateway citiesGateway;
 	private ObjectMapper objectMapper = new ObjectMapper();
 	private CityMapper mapper;
 	
@@ -73,14 +73,14 @@ class CitiesGatewayImplTest {
 		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
 		mapper = Mappers.getMapper(CityMapper.class);
-		citiesPort = new CitiesGatewayImpl(restTemplateCustom, opwProperties, mapper);
+		citiesGateway = new CitiesGatewayImpl(restTemplateCustom, opwProperties, mapper);
 	}
 	
 	
 	@Test
 	void getCityInfo_success() {
 		URI uri = UriComponentsBuilder.fromHttpUrl(opwProperties.getGeocode().getGeocodeUrl())
-				.queryParam(OpenWeatherConstants.QUERY_PARAM_CITY, CITY_NAME)
+				.queryParam(OpenWeatherConstants.QUERY_PARAM_CITY, CITY_NAME + "," + OpenWeatherConstants.US_COUNTRY_CODE)
 				.queryParam(OpenWeatherConstants.QUERY_PARAM_LIMIT, opwProperties.getGeocode().getLimitResults())
 				.queryParam(OpenWeatherConstants.QUERY_PARAM_APP_ID, opwProperties.getAppKey())
 				.build().toUri() ;
@@ -92,7 +92,7 @@ class CitiesGatewayImplTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.body(responseJson));
 		
-		 List<CityDO> cities = citiesPort.getCityInfo(CITY_NAME);
+		 List<CityDO> cities = citiesGateway.getCityInfo(CITY_NAME);
 		 assertThat(cities).isNotNull().isNotEmpty();
 	}
 }
