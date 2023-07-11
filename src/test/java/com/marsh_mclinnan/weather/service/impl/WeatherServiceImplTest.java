@@ -2,6 +2,7 @@ package com.marsh_mclinnan.weather.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -16,7 +17,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.github.javafaker.Faker;
+import com.marsh_mclinnan.weather.domain.AirPollutionDO;
 import com.marsh_mclinnan.weather.domain.CityDO;
+import com.marsh_mclinnan.weather.domain.WeatherAndAirPollutionListDO;
+import com.marsh_mclinnan.weather.domain.WeatherCurrentDO;
 import com.marsh_mclinnan.weather.domain.WeatherForecastDO;
 import com.marsh_mclinnan.weather.exception.CityNotFoundException;
 import com.marsh_mclinnan.weather.gateway.AirPollutionGateway;
@@ -66,5 +70,27 @@ class WeatherServiceImplTest {
 		assertThat(forecast).isNull();
 	}
 
-	
+	@Test
+	void getWeatherAndPollution_noCitiesFound_error() {
+		when(citiesGateway.getCityInfo(anyString())).thenReturn(List.of());
+		Throwable cityNotFound = catchThrowable(() -> service.getWeatherAndPollution(List.of(faker.address().city())));
+		AssertionsForClassTypes.assertThat(cityNotFound).isInstanceOf(CityNotFoundException.class);
+	}
+
+	@Test
+	void getWeatherAndPollution_oneResults_success() {
+		String cityName = faker.address().city();
+		CityDO city = CityDO.builder()
+			.lat(new BigDecimal(LAT))
+			.lon(new BigDecimal(LON))
+			.name(cityName)
+			.build();
+		
+		when(citiesGateway.getCityInfo(anyString())).thenReturn(List.of(city));
+		when(weatherGateway.getCurrentWeather(any(), any())).thenReturn(new WeatherCurrentDO());
+		when(airPollutionGateway.getAirPollutionPort(any(), any())).thenReturn(new AirPollutionDO());
+		
+		WeatherAndAirPollutionListDO response = service.getWeatherAndPollution(List.of(faker.address().city()));
+		assertThat(response).isNotNull();
+	}
 }

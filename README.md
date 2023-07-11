@@ -18,9 +18,15 @@ The application can be run locally, the requirements are listed below.
 ### Local
 * [Java 11 SDK](https://www.oracle.com/mx/java/technologies/downloads/#java11)
 * [Maven](https://maven.apache.org/download.cgi)
+* Docker and docker-compose
 
 
 ### Run Local
+First is required to star the keycloack image for auth
+```bash
+$ docker-compose up auth
+```
+After that startup the weather service
 ```bash
 $ mvn spring-boot:run
 ```
@@ -33,13 +39,22 @@ An openweathermap app key is required to be set on `opw.app-key` in __applicatio
 
 
 ## Testing
+The oauth service has already configured client credentials
+```bash
+curl -L -X POST 'http://localhost:8180/realms/weather/protocol/openid-connect/token' \
+--data-urlencode 'client_id=weatherClient' \
+--data-urlencode 'client_secret=Pr97pgLUXfY4F9Ep6sbLCUyy9bt8eJFA' \
+--data-urlencode 'grant_type=client_credentials' 
+````
+
+
 For call the first request here is an example
 ```
-CURL http://localhost:8080/weather/forecast?city=<cityName>
+CURL http://localhost:8080/weather/forecast?city=<cityName> -H "Authorization: Bearer <token>"
 ```
 For call the second request here is a CURL example
 ```
-CURL http://localhost:8080/weather/current?cities=<cityOne>,<cityTwo>
+CURL http://localhost:8080/weather/current?cities=<cityOne>,<cityTwo> -H "Authorization: Bearer <token>"
 ```
 
 
